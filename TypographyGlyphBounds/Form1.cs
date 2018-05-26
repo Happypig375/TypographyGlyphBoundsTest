@@ -23,7 +23,7 @@ namespace TypographyGlyphBounds
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            const string s = "12345678";
+            const string s = "0123456789";
             const float z = 80;
             const bool f = true;
             var m = GetType().Assembly;
@@ -41,7 +41,8 @@ namespace TypographyGlyphBounds
             var h = Pens.Black.Brush;
             var u = Pens.Blue;
             var v = Pens.Red;
-            var j = false;
+            const bool _ = true;
+            var j = true;
             using (var g = e.Graphics)
             {
                 if (f)
@@ -54,18 +55,21 @@ namespace TypographyGlyphBounds
                     var o = q.LayoutAndMeasureString(new[] { s[i] }, 0, 1, z);
                     var n = p.GetGlyph(i, out var x, out var y, out var w);
                     var a = g.Save();
-                    var d = t.Lookup(n).Bounds;
+                    var d = t.GetGlyphByIndex(n).Bounds;
                     var k = R.FromLTRB(d.XMin * c, d.YMin * c, d.XMax * c, d.YMax * c);
                     g.TranslateTransform(x * c, y * c);
                     b.Build(s[i], z);
                     b.ReadShapes(r);
                     r.ResultGraphicsPath.CloseFigure();
                     g.FillPath(h, r.ResultGraphicsPath);
-                    if(j) g.DrawRectangle(u, 0, 0, o.width, o.ascending - o.descending);
-                    else g.DrawRectangle(v, k.X, k.Y, k.Width, k.Height);
+                    if(_ || j) g.DrawRectangle(u, 0, 0, o.width, o.ascending - o.descending);
+                    if (_ || !j) g.DrawRectangle(v, k.X, k.Y, k.Width, k.Height);
                     g.Restore(a);
                     g.TranslateTransform(w * c, 0);
                 }
+
+                g.ResetTransform();
+                g.DrawString("Blue = LayoutAndMeasureString, Red = Glyph.Bounds", Font, h, 0, 0);
             }
         }
     }
