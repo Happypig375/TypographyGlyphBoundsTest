@@ -22,7 +22,7 @@ namespace TypographyGlyphBounds
         }
         protected override void OnPaint(PaintEventArgs e)
         {
-            Issue119(e);
+            Issue120(e);
         }
         void Issue118(PaintEventArgs e)
         {
@@ -100,6 +100,52 @@ namespace TypographyGlyphBounds
             e.Graphics.FillPath(Pens.Black.Brush, r.ResultGraphicsPath);
             e.Graphics.ResetTransform();
             e.Graphics.DrawString("Blue = GetHAdvanceWidthFromGlyphIndex,\nRed = Glyph.Bounds of radical.v4", Font, Pens.Black.Brush, 0, 0);
+        }
+        void Issue120(PaintEventArgs e)
+        {
+            Text = "Issue 120 demo";
+            const float z = 20;
+            var m = GetType().Assembly;
+            var t = new OpenFontReader().Read
+                (m.GetManifestResourceStream
+                (Array.Find(m.GetManifestResourceNames(), n => n.EndsWith("otf"))));
+            t.UpdateAllCffGlyphBounds();
+            var c = t.CalculateScaleToPixelFromPointSize(z);
+            var b = new B(t);
+            var r = new SampleWinForms.GlyphTranslatorToGdiPath();
+            var i = 1;
+
+            e.Graphics.DrawString("Point size = " + z, Font, Brushes.Black, 0, 0);
+            e.Graphics.ScaleTransform(1, -1);
+            e.Graphics.TranslateTransform(0, -Height / 1.5f);
+            var f = (Action<string>)(n =>
+            {
+                var g = t.GetGlyphByName(n);
+                var o = g.Bounds;
+                var k = R.FromLTRB(o.XMin * c, o.YMin * c, o.XMax * c, o.YMax * c);
+                b.BuildFromGlyph(g, z);
+                b.ReadShapes(r);
+                e.Graphics.FillPath(Brushes.Black, r.ResultGraphicsPath);
+                e.Graphics.DrawRectangle(Pens.Blue, k.X, k.Y, k.Width, k.Height);
+                var a = e.Graphics.Save();
+                e.Graphics.ResetTransform();
+                e.Graphics.DrawString($"{n} - X: {k.X}, Y: {k.Y}, W: {k.Width}, H: {k.Height}", Font, Brushes.Black, 0, Font.Height * i);
+                i++;
+                e.Graphics.Restore(a);
+                e.Graphics.TranslateTransform(k.Right, 0);
+            });
+            
+            f("radical");
+            f("radical.v1");
+            f("radical.v2");
+            f("radical.v3");
+            f("radical.v4");
+            f("slash.v6");
+            f("slash.v7");
+            f("backslash.v6");
+            f("backslash.v7");
+            f("fraction.v6");
+            f("fraction.v7");
         }
     }
 }
