@@ -88,17 +88,18 @@ namespace TypographyGlyphBounds
             var c = t.CalculateScaleToPixelFromPointSize(z);
             var b = new B(t);
             var r = new SampleWinForms.GlyphTranslatorToGdiPath();
-            var g = t.GetGlyphByName("radical.v2");
+            var g = t.GetGlyphByName("radical.v4");
             var o = g.Bounds;
             var k = R.FromLTRB(o.XMin * c, o.YMin * c, o.XMax * c, o.YMax * c);
             b.BuildFromGlyph(g, z);
             b.ReadShapes(r);
             e.Graphics.ScaleTransform(1, -1);
-            e.Graphics.TranslateTransform(0, -Height / 2);
+            e.Graphics.TranslateTransform(0, -Height / 2.5f);
+            e.Graphics.FillRectangle(Pens.Red.Brush, k.X, k.Y, k.Width, k.Height);
+            e.Graphics.DrawRectangle(Pens.Blue, k.X, k.Y, t.GetHAdvanceWidthFromGlyphIndex(g.GlyphIndex) * c, k.Height);
             e.Graphics.FillPath(Pens.Black.Brush, r.ResultGraphicsPath);
-            e.Graphics.DrawRectangle(Pens.Blue, k.X, k.Y, k.Width, k.Height);
             e.Graphics.ResetTransform();
-            e.Graphics.DrawString("Blue = Glyph.Bounds of radical.v2", Font, Pens.Black.Brush, 0, 0);
+            e.Graphics.DrawString("Blue = GetHAdvanceWidthFromGlyphIndex,\nRed = Glyph.Bounds of radical.v4", Font, Pens.Black.Brush, 0, 0);
         }
     }
 }
