@@ -20,9 +20,13 @@ namespace TypographyGlyphBounds
         {
             InitializeComponent();
         }
-
         protected override void OnPaint(PaintEventArgs e)
         {
+            Issue119(e);
+        }
+        void Issue118(PaintEventArgs e)
+        {
+            Text = "Issue 118 Demo";
             const string s = "0123456789";
             const float z = 80;
             const bool f = true;
@@ -71,6 +75,30 @@ namespace TypographyGlyphBounds
                 g.ResetTransform();
                 g.DrawString("Blue = LayoutAndMeasureString, Red = Glyph.Bounds", Font, h, 0, 0);
             }
+        }
+        void Issue119(PaintEventArgs e)
+        {
+            Text = "Issue 119 Demo";
+            const float z = 80;
+            var m = GetType().Assembly;
+            var t = new OpenFontReader().Read
+                (m.GetManifestResourceStream
+                (Array.Find(m.GetManifestResourceNames(), n => n.EndsWith("otf"))));
+            t.UpdateAllCffGlyphBounds();
+            var c = t.CalculateScaleToPixelFromPointSize(z);
+            var b = new B(t);
+            var r = new SampleWinForms.GlyphTranslatorToGdiPath();
+            var g = t.GetGlyphByName("radical.v2");
+            var o = g.Bounds;
+            var k = R.FromLTRB(o.XMin * c, o.YMin * c, o.XMax * c, o.YMax * c);
+            b.BuildFromGlyph(g, z);
+            b.ReadShapes(r);
+            e.Graphics.ScaleTransform(1, -1);
+            e.Graphics.TranslateTransform(0, -Height / 2);
+            e.Graphics.FillPath(Pens.Black.Brush, r.ResultGraphicsPath);
+            e.Graphics.DrawRectangle(Pens.Blue, k.X, k.Y, k.Width, k.Height);
+            e.Graphics.ResetTransform();
+            e.Graphics.DrawString("Blue = Glyph.Bounds of radical.v2", Font, Pens.Black.Brush, 0, 0);
         }
     }
 }
